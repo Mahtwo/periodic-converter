@@ -156,29 +156,32 @@
             string text = enteredText.Trim();
 
             //Add all the words to a list witout the white spaces
-            List<string> listWords = new();
-            string word = "";
+            List<string> words = new();
+            string tmpWord = "";
             foreach (char c in text)
             {
                 if (Char.IsWhiteSpace(c))
                 {
-                    if (word != "")
+                    if (tmpWord != "")
                     {
-                        listWords.Add(word);
-                        word = "";
+                        words.Add(tmpWord);
+                        tmpWord = "";
                     }
                 }
                 else
                 {
-                    word += c;
+                    tmpWord += c;
                 }
             }
-            if (word != "")
+            if (tmpWord != "")
             {
-                listWords.Add(word);
+                words.Add(tmpWord);
             }
 
+            foreach (string word in words)
+            {
 
+            }
         }
     }
 }
