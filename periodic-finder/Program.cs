@@ -63,49 +63,10 @@ namespace periodic_finder
             }
         );
 
-        static void Main(string[] args)
+        static void Main(/*string[] args*/)
         {
-            Console.Write("Enter a text to convert : ");
-            string? enteredText = Console.ReadLine();
-
-            //While until the entered text is correct
-            while (enteredText is null || !enteredText.Any(Char.IsLetter))
-            {
-                if (enteredText is null)
-                {
-                    Console.Write("A problem occured, enter a text again : ");
-                }
-                else
-                {
-                    Console.Write("The entered text doesn't contain any letters, enter a text again : ");
-                }
-                enteredText = Console.ReadLine();
-            }
-            //Remove white-spaces at the beginning and end
-            string text = enteredText.Trim();
-
-            //Add all the words to a list witout the white spaces
-            List<string> words = new();
-            string tmpWord = "";
-            foreach (char c in text)
-            {
-                if (Char.IsLetter(c))
-                {
-                    tmpWord += c;
-                }
-                else
-                {
-                    if (tmpWord != "")
-                    {
-                        words.Add(tmpWord);
-                        tmpWord = "";
-                    }
-                }
-            }
-            if (tmpWord != "")
-            {
-                words.Add(tmpWord);
-            }
+            string text = EnterText();
+            List<string> words = GetWordsFromText(text);
 
             //Convert words to make them fully uppercase and remove accents
             List<string> convertedWords = new();
@@ -141,6 +102,65 @@ namespace periodic_finder
                     Console.WriteLine(')');
                 }
             }
+        }
+
+        /// <summary>
+        /// Ask the user to enter a text and return the words from it
+        /// </summary>
+        /// <returns>List of words</returns>
+        private static string EnterText()
+        {
+            Console.Write("Enter a text to convert : ");
+            string? enteredText = Console.ReadLine();
+
+            //While until the entered text is correct
+            while (enteredText is null || !enteredText.Any(Char.IsLetter))
+            {
+                if (enteredText is null)
+                {
+                    Console.Write("A problem occured, enter a text again : ");
+                }
+                else
+                {
+                    Console.Write("The entered text doesn't contain any letters, enter a text again : ");
+                }
+                enteredText = Console.ReadLine();
+            }
+
+            //Remove white-spaces at the beginning and end
+            return enteredText.Trim();
+        }
+
+        /// <summary>
+        /// Get all the words from a text
+        /// </summary>
+        /// <param name="text">Text to get the words from</param>
+        /// <returns>List of words</returns>
+        private static List<string> GetWordsFromText(string text)
+        {
+            List<string> words = new();
+            string tmpWord = "";
+            foreach (char c in text)
+            {
+                if (Char.IsLetter(c))
+                {
+                    tmpWord += c;
+                }
+                else
+                {
+                    if (tmpWord != "")
+                    {
+                        words.Add(tmpWord);
+                        tmpWord = "";
+                    }
+                }
+            }
+            if (tmpWord != "")
+            {
+                words.Add(tmpWord);
+            }
+
+            return words;
         }
 
         /// <summary>
