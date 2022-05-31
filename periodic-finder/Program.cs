@@ -109,13 +109,50 @@ namespace periodic_finder
                 words.Add(tmpWord);
             }
 
+            //Convert words to make them fully uppercase and remove accents
             List<string> convertedWords = new();
             foreach (string word in words)
             {
                 convertedWords.Add(ConvertWord(word));
             }
 
+            //For each words
+            for (int i = 0; i < words.Count; i++)
+            {
+                Console.Write(words[i] + " : ");
+                List<int> atomicNumbers = ConvertToAtomicNumbers(convertedWords[i]);
 
+                if (atomicNumbers is null)
+                {
+                    Console.WriteLine("Conversion impossible");
+                }
+                else
+                {
+                    //Display the atomic numbers
+                    foreach (int number in atomicNumbers)
+                    {
+                        Console.Write(number + " ");
+                    }
+
+                    Console.Write('(');
+                    //Display the symbols
+                    foreach (int number in atomicNumbers)
+                    {
+                        Console.Write(periodicTable[number - 1]);
+                    }
+                    Console.WriteLine(')');
+                }
+            }
+        }
+
+        /// <summary>
+        /// Convert to atomic numbers the word specified in parameter
+        /// </summary>
+        /// <param name="word">Word to convert</param>
+        /// <returns>Atomic numbers</returns>
+        private static List<int> ConvertToAtomicNumbers(string word)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
