@@ -1,4 +1,6 @@
-﻿namespace periodic_finder
+﻿using System.Collections.ObjectModel;
+
+namespace periodic_finder
 {
     internal class Program
     {
@@ -6,7 +8,7 @@
         /// Array of the periodic table
         /// The atomic number of an element is index + 1
         /// </summary>
-        private static readonly string[] periodicTable = new string[]
+        public static readonly string[] periodicTable = new string[]
         {
             "H","He","Li","Be","B","C","N","O","F","Ne",
             "Na","Mg","Al","Si","P","S","Cl","Ar","K","Ca",
@@ -26,7 +28,7 @@
         /// Array of the periodic table in uppercase
         /// The atomic number of an element is index + 1
         /// </summary>
-        private static readonly string[] periodicTableUppercase = new string[]
+        public static readonly string[] periodicTableUppercase = new string[]
         {
             "H","HE","LI","BE","B","C","N","O","F","NE",
             "NA","MG","AL","SI","P","S","CL","AR","K","CA",
@@ -41,6 +43,25 @@
             "MD","NO","LR","RF","DB","SG","BH","HS","MT","DS",
             "RG","CN","NH","FL","MC","LV","TS","OG"
         };
+
+        /// <summary>
+        /// Dictionary of uppercased accented characters with their unaccented version
+        /// </summary>
+        /// <remarks>
+        /// Value is a string as some characters like Œ correspond to more than one character
+        /// </remarks>
+        public static readonly ReadOnlyDictionary<char, string> uppercaseAccentConversion = new(
+            new Dictionary<char, string>
+            {
+                {'À',"A"},{'Á',"A"},{'Â',"A"},{'Ä',"A"},{'Å',"A"},{'Ã',"A"},
+                {'É',"E"},{'È',"E"},{'Ê',"E"},{'Ë',"E"},
+                {'Í',"I"},{'Ì',"I"},{'Î',"I"},{'Ï',"I"},
+                {'Ó',"O"},{'Ò',"O"},{'Ô',"O"},{'Ö',"O"},{'Õ',"O"},
+                {'Ú',"U"},{'Ù',"U"},{'Û',"U"},{'Ü',"U"},
+                {'Ý',"Y"},
+                {'Ç',"C"},{'Ñ',"N"},{'Æ',"AE"},{'Œ',"OE"}
+            }
+        );
 
         static void Main(string[] args)
         {
@@ -88,10 +109,39 @@
                 words.Add(tmpWord);
             }
 
+            List<string> convertedWords = new();
             foreach (string word in words)
             {
-
+                convertedWords.Add(ConvertWord(word));
             }
+
+
+        }
+
+        /// <summary>
+        /// Convert a word to make it fully uppercase and remove accents
+        /// </summary>
+        /// <param name="word">Word to convert</param>
+        /// <returns>Converted word</returns>
+        private static string ConvertWord(string word)
+        {
+            string uppercaseWord = word.ToUpper();
+
+            string convertedWord = "";
+            foreach (char c in uppercaseWord)
+            {
+                //If character has an accent, get the unaccented version
+                if (uppercaseAccentConversion.ContainsKey(c))
+                {
+                    convertedWord += uppercaseAccentConversion[c];
+                }
+                else
+                {
+                    convertedWord += c;
+                }
+            }
+
+            return convertedWord;
         }
     }
 }
