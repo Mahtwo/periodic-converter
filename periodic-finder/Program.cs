@@ -74,20 +74,22 @@ namespace periodic_finder
             //Display the menu
             Console.WriteLine("PERIODIC-FINDER\n");
             Console.WriteLine("1. Enter a text manually");
-            Console.WriteLine("2. Select a text file");
+            Console.WriteLine("2. Select a text file (Show all words)");
+            Console.WriteLine("3. Select a text file (Show converted words only)");
             Console.WriteLine("0. Quit");
             Console.Write("Enter a number : ");
 
             int choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
 
             //While the entered number isn't valid, ask to enter another number
-            while (choice < 0 || choice > 2)
+            while (choice < 0 || choice > 3)
             {
                 Console.Write("Not valid, enter a number again : ");
                 choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
             }
 
             List<string> words = new List<string>();
+            bool onlyConverted = false;
             switch (choice)
             {
                 case 1:
@@ -106,6 +108,19 @@ namespace periodic_finder
                         return;
                     }
                     break;
+                case 3:
+                    Console.WriteLine();
+                    words = SelectFile();
+
+                    //If no file was selected or the file didn't contain words
+                    if (words.Count == 0)
+                    {
+                        Console.WriteLine("Invalid file, no words were found");
+                        return;
+                    }
+
+                    onlyConverted = true;
+                    break;
                 case 0:
                     //Exit the method, which exit the programs here
                     return;
@@ -121,15 +136,19 @@ namespace periodic_finder
             //For each words
             for (int i = 0; i < words.Count; i++)
             {
-                Console.Write(words[i] + " : ");
                 List<int> atomicNumbers = ConvertToAtomicNumbers(convertedWords[i]);
 
                 if (atomicNumbers is null)
                 {
-                    Console.WriteLine("Conversion impossible");
+                    if (!onlyConverted)
+                    {
+                        Console.WriteLine(words[i] + " : Conversion impossible");
+                    }
                 }
                 else
                 {
+                    Console.Write(words[i] + " : ");
+
                     //Display the atomic numbers
                     foreach (int number in atomicNumbers)
                     {
@@ -155,7 +174,7 @@ namespace periodic_finder
         {
             List<string> words = new List<string>();
 
-            Console.WriteLine("Select a text file...");
+            Console.WriteLine("Select a text file");
 
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
@@ -168,13 +187,34 @@ namespace periodic_finder
 
                 if (dialogResult == DialogResult.OK)
                 {
+                    Console.WriteLine("Getting all the words from the file...");
+
                     //Read the contents of the file into a stream
                     Stream fileStream = openFileDialog.OpenFile();
 
                     using (StreamReader reader = new StreamReader(fileStream))
                     {
-                        //TODO : Read the selected file line by line
+                        long fileLength = reader.BaseStream.Length;
+                        long lastPercentage = -1;
+                        while (!reader.EndOfStream)
+                        {
+                            long percentage = reader.BaseStream.Position * 100 / fileLength;
+
+                            //Actualise the progression only if needed, otherwise it would slow down the program
+                            if (percentage > lastPercentage)
+                            {
+                                lastPercentage = percentage;
+                                ShowProgression((byte)percentage);
+                            }
+
+                            //Add all the words from the current line to the list of words
+                            foreach (string word in GetWordsFromText(reader.ReadLine()))
+                            {
+                                words.Add(word);
+                            }
+                        }
                     }
+                    Console.WriteLine('\n');
                 }
             }
 
@@ -335,6 +375,27 @@ namespace periodic_finder
             }
 
             return convertedWord;
+        }
+
+        /// <summary>
+        /// Show the progression using a bar progressively filled with asterisks
+        /// </summary>
+        /// <param name="percentage">Percentage of progression</param>
+        public static void ShowProgression(byte percentage)
+        {
+            string bar = "";
+            for (int i = 0; i < 10; i++)
+            {
+                if (percentage / 10 > i)
+                {
+                    bar += '*';
+                }
+                else
+                {
+                    bar += ' ';
+                }
+            }
+            Console.Write("\r[" + bar + "] " + percentage + '%');
         }
     }
 }
