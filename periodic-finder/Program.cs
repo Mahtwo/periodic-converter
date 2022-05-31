@@ -65,8 +65,6 @@ namespace periodic_finder
 
         static void Main(string[] args)
         {
-            string[] lPeriodicTable = periodicTable;
-
             Console.Write("Enter a text to convert : ");
             string? enteredText = Console.ReadLine();
 
