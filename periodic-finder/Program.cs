@@ -1,4 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Linq;
+using System.Windows.Forms;
 
 namespace periodic_finder
 {
@@ -50,7 +55,7 @@ namespace periodic_finder
         /// <remarks>
         /// Value is a string as some characters like Œ correspond to more than one character
         /// </remarks>
-        public static readonly ReadOnlyDictionary<char, string> uppercaseAccentConversion = new(
+        public static readonly ReadOnlyDictionary<char, string> uppercaseAccentConversion = new ReadOnlyDictionary<char, string>(
             new Dictionary<char, string>
             {
                 {'À',"A"},{'Á',"A"},{'Â',"A"},{'Ä',"A"},{'Å',"A"},{'Ã',"A"},
@@ -63,13 +68,51 @@ namespace periodic_finder
             }
         );
 
+        [STAThread]
         static void Main(/*string[] args*/)
         {
-            string text = EnterText();
-            List<string> words = GetWordsFromText(text);
+            //Display the menu
+            Console.WriteLine("PERIODIC-FINDER\n");
+            Console.WriteLine("1. Enter a text manually");
+            Console.WriteLine("2. Select a text file");
+            Console.WriteLine("0. Quit");
+            Console.Write("Enter a number : ");
+
+            int choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
+
+            //While the entered number isn't valid, ask to enter another number
+            while (choice < 0 || choice > 2)
+            {
+                Console.Write("Not valid, enter a number again : ");
+                choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
+            }
+
+            List<string> words = new List<string>();
+            switch (choice)
+            {
+                case 1:
+                    Console.WriteLine();
+                    string text = EnterText();
+                    words = GetWordsFromText(text);
+                    break;
+                case 2:
+                    Console.WriteLine();
+                    words = SelectFile();
+
+                    //If no file was selected or the file didn't contain words
+                    if (words.Count == 0)
+                    {
+                        Console.WriteLine("Invalid file, no words were found");
+                        return;
+                    }
+                    break;
+                case 0:
+                    //Exit the method, which exit the programs here
+                    return;
+            }
 
             //Convert words to make them fully uppercase and remove accents
-            List<string> convertedWords = new();
+            List<string> convertedWords = new List<string>();
             foreach (string word in words)
             {
                 convertedWords.Add(ConvertWord(word));
@@ -79,7 +122,7 @@ namespace periodic_finder
             for (int i = 0; i < words.Count; i++)
             {
                 Console.Write(words[i] + " : ");
-                List<int>? atomicNumbers = ConvertToAtomicNumbers(convertedWords[i]);
+                List<int> atomicNumbers = ConvertToAtomicNumbers(convertedWords[i]);
 
                 if (atomicNumbers is null)
                 {
@@ -105,13 +148,47 @@ namespace periodic_finder
         }
 
         /// <summary>
+        /// Get all the words from a selected text file
+        /// </summary>
+        /// <returns>List of words</returns>
+        private static List<string> SelectFile()
+        {
+            List<string> words = new List<string>();
+
+            Console.WriteLine("Select a text file...");
+
+            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            {
+                openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+                openFileDialog.InitialDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+                openFileDialog.FilterIndex = 2;
+
+                DialogResult dialogResult = openFileDialog.ShowDialog();
+                Console.WriteLine();
+
+                if (dialogResult == DialogResult.OK)
+                {
+                    //Read the contents of the file into a stream
+                    Stream fileStream = openFileDialog.OpenFile();
+
+                    using (StreamReader reader = new StreamReader(fileStream))
+                    {
+                        //TODO : Read the selected file line by line
+                    }
+                }
+            }
+
+            return words;
+        }
+
+        /// <summary>
         /// Ask the user to enter a text and return the words from it
         /// </summary>
         /// <returns>List of words</returns>
         private static string EnterText()
         {
             Console.Write("Enter a text to convert : ");
-            string? enteredText = Console.ReadLine();
+            string enteredText = Console.ReadLine();
 
             //While until the entered text is correct
             while (enteredText is null || !enteredText.Any(Char.IsLetter))
@@ -138,7 +215,7 @@ namespace periodic_finder
         /// <returns>List of words</returns>
         private static List<string> GetWordsFromText(string text)
         {
-            List<string> words = new();
+            List<string> words = new List<string>();
             string tmpWord = "";
             foreach (char c in text)
             {
@@ -168,9 +245,9 @@ namespace periodic_finder
         /// </summary>
         /// <param name="word">Word to convert</param>
         /// <returns>Atomic numbers</returns>
-        private static List<int>? ConvertToAtomicNumbers(string word)
+        private static List<int> ConvertToAtomicNumbers(string word)
         {
-            List<int> atomicNumbers = new();
+            List<int> atomicNumbers = new List<int>();
             int index = 0;  //Part of the word to search in the periodic table
             int letters;  //Whether to search one or two letters in the periodic table
             if (word.Length == 1)
