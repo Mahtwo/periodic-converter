@@ -120,7 +120,7 @@ namespace periodic_finder
             for (int i = 0; i < words.Count; i++)
             {
                 Console.Write(words[i] + " : ");
-                List<int> atomicNumbers = ConvertToAtomicNumbers(convertedWords[i]);
+                List<int>? atomicNumbers = ConvertToAtomicNumbers(convertedWords[i]);
 
                 if (atomicNumbers is null)
                 {
@@ -150,9 +150,70 @@ namespace periodic_finder
         /// </summary>
         /// <param name="word">Word to convert</param>
         /// <returns>Atomic numbers</returns>
-        private static List<int> ConvertToAtomicNumbers(string word)
+        private static List<int>? ConvertToAtomicNumbers(string word)
         {
-            throw new NotImplementedException();
+            List<int> atomicNumbers = new();
+            int index = 0;  //Part of the word to search in the periodic table
+            int letters;  //Whether to search one or two letters in the periodic table
+            if (word.Length == 1)
+            {
+                letters = 1;
+            }
+            else
+            {
+                letters = 2;
+            }
+            bool end = false;  //End the while loop when we got all the atomic numbers
+
+            while (!end)
+            {
+                string subWord = word.Substring(index, letters);
+                bool gotAtomicNumber = false;
+
+                //For all elements
+                for (int i = 0; i < 118; i++)
+                {
+                    if (subWord == periodicTableUppercase[i])
+                    {
+                        atomicNumbers.Add(i + 1);
+                        index += letters;
+                        gotAtomicNumber = true;
+
+                        //If the index is at the end of the word, we got all the atomic numbers
+                        if (index == word.Length)
+                        {
+                            end = true;
+                        }
+                        else
+                        {
+                            if (index + 2 <= word.Length)
+                            {
+                                letters = 2;
+                            }
+                            else
+                            {
+                                letters = 1;
+                            }
+                        }
+
+                        break;
+                    }
+                }
+
+                if (!gotAtomicNumber)
+                {
+                    if (letters == 2)
+                    {
+                        letters = 1;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+
+            return atomicNumbers;
         }
 
         /// <summary>
