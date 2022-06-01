@@ -99,16 +99,6 @@ namespace periodic_finder
                     words = GetWordsFromText(text);
                     break;
                 case 2:
-                    Console.WriteLine();
-                    words = SelectFile();
-
-                    //If no file was selected or the file didn't contain words
-                    if (words.Count == 0)
-                    {
-                        Console.WriteLine("Invalid file, no words were found");
-                        return;
-                    }
-                    break;
                 case 3:
                     Console.WriteLine();
                     words = SelectFile();
@@ -120,7 +110,7 @@ namespace periodic_finder
                         return;
                     }
 
-                    onlyConverted = true;
+                    onlyConverted = choice == 3;
                     break;
                 case 0:
                     //Exit the method, which exit the programs here
