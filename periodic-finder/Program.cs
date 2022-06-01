@@ -399,7 +399,7 @@ namespace periodic_finder
                     }
                     line.Append(")");
 
-                    Console.WriteLine(line);
+                    Console.WriteLine(line.ToString());
                 }
             }
         }
