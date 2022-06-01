@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Windows.Forms;
 
 namespace periodic_finder
@@ -147,21 +148,23 @@ namespace periodic_finder
                 }
                 else
                 {
-                    Console.Write(words[i] + " : ");
+                    StringBuilder line = new StringBuilder(words[i] + " : ");
 
                     //Display the atomic numbers
                     foreach (int number in atomicNumbers)
                     {
-                        Console.Write(number + " ");
+                        line.Append(number + " ");
                     }
 
-                    Console.Write('(');
+                    line.Append("(");
                     //Display the symbols
                     foreach (int number in atomicNumbers)
                     {
-                        Console.Write(periodicTable[number - 1]);
+                        line.Append(periodicTable[number - 1]);
                     }
-                    Console.WriteLine(')');
+                    line.Append(")");
+
+                    Console.WriteLine(line);
                 }
             }
         }
