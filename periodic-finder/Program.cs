@@ -127,46 +127,7 @@ namespace periodic_finder
                     return;
             }
 
-            //Convert words to make them fully uppercase and remove accents
-            List<string> convertedWords = new List<string>();
-            foreach (string word in words)
-            {
-                convertedWords.Add(ConvertWord(word));
-            }
-
-            //For each words
-            for (int i = 0; i < words.Count; i++)
-            {
-                List<int> atomicNumbers = ConvertToAtomicNumbers(convertedWords[i]);
-
-                if (atomicNumbers is null)
-                {
-                    if (!onlyConverted)
-                    {
-                        Console.WriteLine(words[i] + " : Conversion impossible");
-                    }
-                }
-                else
-                {
-                    StringBuilder line = new StringBuilder(words[i] + " : ");
-
-                    //Display the atomic numbers
-                    foreach (int number in atomicNumbers)
-                    {
-                        line.Append(number + " ");
-                    }
-
-                    line.Append("(");
-                    //Display the symbols
-                    foreach (int number in atomicNumbers)
-                    {
-                        line.Append(periodicTable[number - 1]);
-                    }
-                    line.Append(")");
-
-                    Console.WriteLine(line);
-                }
-            }
+            ConvertAndDisplayWords(words, onlyConverted);
         }
 
         /// <summary>
@@ -405,10 +366,59 @@ namespace periodic_finder
         }
 
         /// <summary>
+        /// Convert words with the periodic table and display the conversion
+        /// </summary>
+        /// <param name="words">List of words to convert and display</param>
+        /// <param name="onlyConverted">Whether to show all the words (false) or only those converted (true)</param>
+        private static void ConvertAndDisplayWords(List<string> words, bool onlyConverted)
+        {
+            //Convert words to make them fully uppercase and remove accents
+            List<string> convertedWords = new List<string>();
+            foreach (string word in words)
+            {
+                convertedWords.Add(ConvertWord(word));
+            }
+
+            //For each words
+            for (int i = 0; i < words.Count; i++)
+            {
+                List<int> atomicNumbers = ConvertToAtomicNumbers(convertedWords[i]);
+
+                if (atomicNumbers is null)
+                {
+                    if (!onlyConverted)
+                    {
+                        Console.WriteLine(words[i] + " : Conversion impossible");
+                    }
+                }
+                else
+                {
+                    StringBuilder line = new StringBuilder(words[i] + " : ");
+
+                    //Display the atomic numbers
+                    foreach (int number in atomicNumbers)
+                    {
+                        line.Append(number + " ");
+                    }
+
+                    line.Append("(");
+                    //Display the symbols
+                    foreach (int number in atomicNumbers)
+                    {
+                        line.Append(periodicTable[number - 1]);
+                    }
+                    line.Append(")");
+
+                    Console.WriteLine(line);
+                }
+            }
+        }
+
+        /// <summary>
         /// Show the progression using a bar progressively filled with asterisks
         /// </summary>
         /// <param name="percentage">Percentage of progression</param>
-        public static void ShowProgression(byte percentage)
+        private static void ShowProgression(byte percentage)
         {
             string bar = "";
             for (int i = 0; i < 10; i++)
