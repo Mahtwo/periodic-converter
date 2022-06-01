@@ -288,6 +288,7 @@ namespace periodic_finder
         private static List<int> ConvertToAtomicNumbers(string word)
         {
             List<int> atomicNumbers = new List<int>();
+            List<int> lettersUsed = new List<int>();
             int index = 0;  //Part of the word to search in the periodic table
             int letters;  //Whether to search one or two letters in the periodic table
             if (word.Length == 1)
@@ -311,6 +312,7 @@ namespace periodic_finder
                     if (subWord == periodicTableUppercase[i])
                     {
                         atomicNumbers.Add(i + 1);
+                        lettersUsed.Add(letters);
                         index += letters;
                         gotAtomicNumber = true;
 
@@ -343,7 +345,29 @@ namespace periodic_finder
                     }
                     else
                     {
-                        return null;
+                        //Go back to the lastWord where we used 2 letters and try with one letter instead
+                        if (lettersUsed.Contains(2))
+                        {
+                            int lastTwoIndex = lettersUsed.LastIndexOf(2);
+
+                            //Remove the subWords after and including the last subWords of two letters
+                            lettersUsed.RemoveRange(lastTwoIndex, lettersUsed.Count - lastTwoIndex);
+                            atomicNumbers.RemoveRange(lastTwoIndex, atomicNumbers.Count - lastTwoIndex);
+
+                            //Index to before the last subWord with two letters
+                            index = 0;
+                            foreach (int lLetters in lettersUsed)
+                            {
+                                index += lLetters;
+                            }
+
+                            //Try with one letter
+                            letters = 1;
+                        }
+                        else
+                        {
+                            return null;
+                        }
                     }
                 }
             }
