@@ -391,13 +391,13 @@ namespace periodic_finder
                         line.Append(number + " ");
                     }
 
-                    line.Append("(");
+                    line.Append('(');
                     //Display the symbols
                     foreach (int number in atomicNumbers)
                     {
                         line.Append(periodicTable[number - 1]);
                     }
-                    line.Append(")");
+                    line.Append(')');
 
                     Console.WriteLine(line.ToString());
                 }
@@ -410,19 +410,19 @@ namespace periodic_finder
         /// <param name="percentage">Percentage of progression</param>
         private static void ShowProgression(byte percentage)
         {
-            string bar = "";
+            StringBuilder bar = new StringBuilder();
             for (int i = 0; i < 10; i++)
             {
                 if (percentage / 10 > i)
                 {
-                    bar += '*';
+                    bar.Append('*');
                 }
                 else
                 {
-                    bar += ' ';
+                    bar.Append(' ');
                 }
             }
-            Console.Write("\r[" + bar + "] " + percentage + '%');
+            Console.Write("\r[" + bar.ToString() + "] " + percentage + "%");
         }
     }
 }
