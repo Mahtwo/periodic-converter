@@ -69,55 +69,94 @@ namespace periodic_finder
             }
         );
 
+        /// <summary>
+        /// Whether to show only the converted words
+        /// </summary>
+        public static bool onlyConverted = false;
+
+        /// <summary>
+        /// Whether to show only the unique words
+        /// </summary>
+        public static bool uniqueWords = false;
+
         [STAThread]
         static void Main(/*string[] args*/)
         {
-            //Display the menu
-            Console.WriteLine("PERIODIC-FINDER\n");
-            Console.WriteLine("1. Enter a text manually");
-            Console.WriteLine("2. Select a text file (Show all words)");
-            Console.WriteLine("3. Select a text file (Show converted words only)");
-            Console.WriteLine("0. Quit");
-            Console.Write("Enter a number : ");
+            List<string> words = Menu();
 
-            int choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
-
-            //While the entered number isn't valid, ask to enter another number
-            while (choice < 0 || choice > 3)
+            //Exit the program if Menu() returned null
+            if (words == null)
             {
-                Console.Write("Not valid, enter a number again : ");
-                choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
+                return;
             }
 
-            List<string> words = new List<string>();
-            bool onlyConverted = false;
-            switch (choice)
+            ConvertAndDisplayWords(words);
+        }
+
+        /// <summary>
+        /// Display the main menu of the program
+        /// </summary>
+        /// <returns></returns>
+        private static List<string> Menu()
+        {
+            List<string> words = null;
+
+            //(Re)display the menu until we get words
+            do
             {
-                case 1:
-                    Console.WriteLine();
-                    string text = EnterText();
-                    words = GetWordsFromText(text);
-                    break;
-                case 2:
-                case 3:
-                    Console.WriteLine();
-                    words = SelectFile();
+                //Display the menu
+                Console.Clear();  //Clear the console each time the menu needs to be shown
+                Console.WriteLine("PERIODIC-FINDER\n");
+                Console.WriteLine("1. Enter a text manually");
+                Console.WriteLine("2. Select a text file");
+                Console.WriteLine("3. Show only the converted words [" + onlyConverted.ToString().ToUpper() + "]");
+                Console.WriteLine("4. Show only the unique words [" + uniqueWords.ToString().ToUpper() + "]");
+                Console.WriteLine("0. Quit\n");
+                Console.Write("Enter your choice : ");
 
-                    //If no file was selected or the file didn't contain words
-                    if (words.Count == 0)
-                    {
-                        Console.WriteLine("Invalid file, no words were found");
-                        return;
-                    }
+                int choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
 
-                    onlyConverted = choice == 3;
-                    break;
-                case 0:
-                    //Exit the method, which exit the programs here
-                    return;
-            }
+                //While the entered number isn't valid, ask to enter another number
+                while (choice < 0 || choice > 4)
+                {
+                    Console.Write("Not valid, enter a number again : ");
+                    choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
+                }
 
-            ConvertAndDisplayWords(words, onlyConverted);
+                switch (choice)
+                {
+                    case 1:
+                        Console.WriteLine();
+                        string text = EnterText();
+                        words = GetWordsFromText(text);
+                        break;
+                    case 2:
+                        Console.WriteLine();
+                        words = SelectFile();
+
+                        //If no file was selected or the file didn't contain words
+                        if (words.Count == 0)
+                        {
+                            words = null;
+
+                            Console.WriteLine("Invalid file, no words were found");
+                            Console.WriteLine("[PRESS ANY KEY TO CONTINUE]");
+                            Console.ReadKey(true);
+                        }
+                        break;
+                    case 3:
+                        onlyConverted = !onlyConverted;
+                        break;
+                    case 4:
+                        uniqueWords = !uniqueWords;
+                        break;
+                    case 0:
+                        //Exit the method by returning null, which exits the program
+                        return null;
+                }
+            } while (words is null);
+
+            return words;
         }
 
         /// <summary>
@@ -168,6 +207,9 @@ namespace periodic_finder
                             }
                         }
                     }
+
+                    //Always actualise the progression to 100% at the end
+                    ShowProgression(100);
                     Console.WriteLine('\n');
                 }
             }
@@ -359,8 +401,7 @@ namespace periodic_finder
         /// Convert words with the periodic table and display the conversion
         /// </summary>
         /// <param name="words">List of words to convert and display</param>
-        /// <param name="onlyConverted">Whether to show all the words (false) or only those converted (true)</param>
-        private static void ConvertAndDisplayWords(List<string> words, bool onlyConverted)
+        private static void ConvertAndDisplayWords(List<string> words)
         {
             //Convert words to make them fully uppercase and remove accents
             List<string> convertedWords = new List<string>();
