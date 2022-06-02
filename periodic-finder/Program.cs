@@ -403,6 +403,12 @@ namespace periodic_finder
         /// <param name="words">List of words to convert and display</param>
         private static void ConvertAndDisplayWords(List<string> words)
         {
+            //Keep only the unique words if the option was selected
+            if (uniqueWords)
+            {
+                words = words.Distinct().ToList();
+            }
+
             //Convert words to make them fully uppercase and remove accents
             List<string> convertedWords = new List<string>();
             foreach (string word in words)
@@ -417,6 +423,7 @@ namespace periodic_finder
 
                 if (atomicNumbers is null)
                 {
+                    //Don't display the not-convertible words if the option was selected
                     if (!onlyConverted)
                     {
                         Console.WriteLine(words[i] + " : Conversion impossible");
