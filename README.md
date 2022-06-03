@@ -1,2 +1,2 @@
 # periodic-finder
- Find how to write a word with the periodic table
+Convert words to write them using the periodic table
