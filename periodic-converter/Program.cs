@@ -172,7 +172,9 @@ namespace periodic_converter
             using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
-                openFileDialog.InitialDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Resources");
+#if DEBUG
+                openFileDialog.InitialDirectory = Path.GetFullPath(Directory.GetCurrentDirectory() + @"\..\..\..\Resources");
+#endif
                 openFileDialog.FilterIndex = 2;
 
                 DialogResult dialogResult = openFileDialog.ShowDialog();
