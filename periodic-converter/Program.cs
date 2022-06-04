@@ -82,6 +82,13 @@ namespace periodic_converter
         [STAThread]
         static void Main(/*string[] args*/)
         {
+            //Detect if a pause is needed at the end of the program (.exe ran directly)
+            bool willCloseTerminal = false;
+            if ((Console.CursorLeft == 0) && (Console.CursorTop == 0))
+            {
+                willCloseTerminal = true;
+            }
+            
             List<string> words = Menu();
 
             //Exit the program if Menu() returned null
@@ -91,6 +98,12 @@ namespace periodic_converter
             }
 
             ConvertAndDisplayWords(words);
+
+            if (willCloseTerminal)
+            {
+                Console.WriteLine("\n[PRESS ANY KEY TO QUIT]");
+                Console.ReadKey(true);
+            }
         }
 
         /// <summary>
