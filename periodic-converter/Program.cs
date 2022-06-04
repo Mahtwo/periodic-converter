@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace periodic_finder
+namespace periodic_converter
 {
     internal class Program
     {
@@ -106,7 +106,7 @@ namespace periodic_finder
             {
                 //Display the menu
                 Console.Clear();  //Clear the console each time the menu needs to be shown
-                Console.WriteLine("PERIODIC-FINDER\n");
+                Console.WriteLine("PERIODIC-CONVERTER\n");
                 Console.WriteLine("1. Enter a text manually");
                 Console.WriteLine("2. Select a text file");
                 Console.WriteLine("3. Show only the converted words [" + onlyConverted.ToString().ToUpper() + "]");

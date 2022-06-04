@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net48</TargetFramework>
-    <RootNamespace>periodic_finder</RootNamespace>
+    <RootNamespace>periodic_converter</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
