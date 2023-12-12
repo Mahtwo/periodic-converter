@@ -79,6 +79,11 @@ namespace periodic_converter
         /// </summary>
         public static bool uniqueWords = false;
 
+        /// <summary>
+        /// Whether to ask for a save location after the conversion
+        /// </summary>
+        public static bool saveToFile = false;
+
         [STAThread]
         static void Main(/*string[] args*/)
         {
@@ -88,7 +93,7 @@ namespace periodic_converter
             {
                 willCloseTerminal = true;
             }
-            
+
             List<string> words = Menu();
 
             //Exit the program if Menu() returned null
@@ -97,9 +102,10 @@ namespace periodic_converter
                 return;
             }
 
-            ConvertAndDisplayWords(words);
+            ConvertAndOutputWords(words);
 
-            if (willCloseTerminal)
+            Console.Out.Flush();
+            if (willCloseTerminal && !saveToFile)
             {
                 Console.WriteLine("\n[PRESS ANY KEY TO QUIT]");
                 Console.ReadKey(true);
@@ -117,20 +123,29 @@ namespace periodic_converter
             //(Re)display the menu until we get words
             do
             {
+                if (!Console.IsOutputRedirected)
+                {
+                    Console.Clear();  //Clear the console each time the menu needs to be shown
+                }
+                else
+                {
+                    Console.OutputEncoding = Encoding.UTF8;
+                    saveToFile = false;  //Output already redirected
+                }
                 //Display the menu
-                Console.Clear();  //Clear the console each time the menu needs to be shown
                 Console.WriteLine("PERIODIC-CONVERTER\n");
                 Console.WriteLine("1. Enter a text manually");
                 Console.WriteLine("2. Select a text file");
                 Console.WriteLine("3. Show only the converted words [" + onlyConverted.ToString().ToUpper() + "]");
                 Console.WriteLine("4. Show only the unique words [" + uniqueWords.ToString().ToUpper() + "]");
+                Console.WriteLine("5. Save conversion to a text file [" + saveToFile.ToString().ToUpper() + "]");
                 Console.WriteLine("0. Quit\n");
                 Console.Write("Enter your choice : ");
 
                 int choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
 
                 //While the entered number isn't valid, ask to enter another number
-                while (choice < 0 || choice > 4)
+                while (choice < 0 || choice > 5)
                 {
                     Console.Write("Not valid, enter a number again : ");
                     choice = int.TryParse(Console.ReadLine(), out choice) ? choice : -1;
@@ -162,6 +177,9 @@ namespace periodic_converter
                         break;
                     case 4:
                         uniqueWords = !uniqueWords;
+                        break;
+                    case 5:
+                        saveToFile = !saveToFile;
                         break;
                     case 0:
                         //Exit the method by returning null, which exits the program
@@ -413,10 +431,10 @@ namespace periodic_converter
         }
 
         /// <summary>
-        /// Convert words with the periodic table and display the conversion
+        /// Convert words with the periodic table and output the conversion
         /// </summary>
         /// <param name="words">List of words to convert and display</param>
-        private static void ConvertAndDisplayWords(List<string> words)
+        private static void ConvertAndOutputWords(List<string> words)
         {
             //Keep only the unique words if the option was selected
             if (uniqueWords)
@@ -429,6 +447,24 @@ namespace periodic_converter
             foreach (string word in words)
             {
                 convertedWords.Add(ConvertWord(word));
+            }
+
+            //Ask for a save location if the option was selected
+            using (SaveFileDialog saveFileDialog = new SaveFileDialog())
+            {
+                saveFileDialog.Filter = "Text files (*.txt)|*.txt|All files (*.*)|*.*";
+#if DEBUG
+                saveFileDialog.InitialDirectory = Path.GetFullPath(Directory.GetCurrentDirectory() + @"\..\..\..\Resources");
+#endif
+                saveFileDialog.FilterIndex = 2;
+
+                DialogResult dialogResult = saveFileDialog.ShowDialog();
+
+                if (dialogResult == DialogResult.OK)
+                {
+                    Stream fileStream = saveFileDialog.OpenFile();
+                    Console.SetOut(new StreamWriter(fileStream));
+                }
             }
 
             //For each words
