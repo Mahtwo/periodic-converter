@@ -1,0 +1,2 @@
+@echo off
+for %%r in (win-arm64 win-x86 win-x64) do echo Publishing with runtime %%r & dotnet publish -p:PublishReadyToRun=true -p:PublishReadyToRunShowWarnings=true -p:PublishSingleFile=true -p:PublishDir=.\publish\%%r --configuration Release --self-contained false --verbosity normal --runtime %%r
